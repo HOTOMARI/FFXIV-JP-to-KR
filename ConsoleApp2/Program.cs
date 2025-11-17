@@ -13,39 +13,12 @@ catch (IOException ex)
     Console.WriteLine(ex.Message);
     return;
 }
-try
-{
-    jpFiles = Directory.GetFiles("output", "ja", SearchOption.AllDirectories);
-}
-catch (IOException ex)
-{
-    Console.WriteLine(ex.Message);
-    return;
-}
+
 foreach (string koFile in koFiles)
 {
     string koFilePath = koFile;
-    string koTargetFilePath = koFilePath.Substring(10);
-    koTargetFilePath = koTargetFilePath.Substring(0, koTargetFilePath.Length - 3);
-    string jpFilePath = "";
-    string outputFilePath = "";
-
-    int loop = 0;
-    foreach (string jpFile in jpFiles)
-    {
-        jpFilePath = jpFile;
-        outputFilePath = jpFilePath.Substring(0, jpFilePath.Length - 2) + "ja";
-        
-        string jpTargetFilePath = jpFilePath.Substring(7);
-        jpTargetFilePath = jpTargetFilePath.Substring(0, jpTargetFilePath.Length - 3);
-        if(jpTargetFilePath == koTargetFilePath)
-        {
-            break;
-        }
-        loop++;
-    }
-    if (loop >= jpFiles.Length) continue;
-
+    string jpFilePath = "output_jp" + koFilePath.Substring(9, koFilePath.Length - (2 + 9)) + "ja";
+    string outputFilePath = "output_XX" + koFilePath.Substring(9, koFilePath.Length - (2 + 9));
 
     StreamReader jpsr = new StreamReader(jpFilePath);
     string jpData = jpsr.ReadToEnd();
@@ -99,11 +72,16 @@ foreach (string koFile in koFiles)
     }
 
     string output = JsonConvert.SerializeObject(jpDataList, Formatting.Indented);
-    FileStream fs = File.Create(outputFilePath);
+    DirectoryInfo di = new DirectoryInfo(outputFilePath);
+    if (di.Exists == false) 
+    { 
+        di.Create(); 
+    }
+    FileStream fs = File.Create(outputFilePath + "ja");
     Console.WriteLine(outputFilePath);
     fs.Close();
-    if (File.Exists(outputFilePath))
-        File.WriteAllText(outputFilePath, output);
+    if (File.Exists(outputFilePath + "ja"))
+        File.WriteAllText(outputFilePath + "ja", output);
 }
 
 
